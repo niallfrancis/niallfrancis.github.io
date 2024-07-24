@@ -1,5 +1,4 @@
 var map = L.map('map').setView([53.121894512502045, -1.5519944913521624], 7);
-
 const readCsv = async () => {
     try {
         //read .csv file on a server
@@ -19,8 +18,68 @@ const readCsv = async () => {
         });
 
         if (res.status === 200) {
-            const data = await res.text();
-            console.log(data);
+            csvData = await res.text();
+            console.log('Here');
+            console.log(csvData);
+
+
+
+            // Split the CSV data into lines
+const lines = csvData.split('\n');
+
+// Extract the headers
+const headers = lines[0].replace(/"/g, '').split(',');
+
+// Initialize an array to hold the data
+const data = [];
+
+// Loop through each line of data (skip the first line as it is the header)
+for (let i = 1; i < lines.length; i++) {
+    // Split each line by comma to get the individual parts
+    const parts = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(part => part.replace(/"/g, ''));
+    
+    // Create an object to hold the current row data
+    const row = {};
+    
+    // Loop through each part and assign it to the corresponding header
+    headers.forEach((header, index) => {
+        row[header] = parts[index];
+    });
+    
+    // Push the row object to the data array
+    data.push(row);
+}
+
+// Output the data array to see the result
+console.log(data);
+
+// Now you can access each row and the corresponding variables
+data.forEach(entry => {
+    const { Name, Region, Address, Day, Discord, Latitude, Longitude, Image } = entry;
+    console.log(`Name: ${Name}`);
+    console.log(`Region: ${Region}`);
+    console.log(`Address: ${Address}`);
+    console.log(`Day: ${Day}`);
+    console.log(`Discord: ${Discord}`);
+    console.log(`Latitude: ${Latitude}`);
+    console.log(`Longitude: ${Longitude}`);
+    console.log(`Image: ${Image}`);
+    console.log('--------------------------');
+
+    L.marker([Latitude, Longitude], {icon: new LeafIcon({iconUrl: Image})}).addTo(map).bindPopup(Name + '<p>' + Region + '<p>' + Address + '<p>' + Day + '<p>' + Discord);
+
+});
+
+
+
+
+
+
+
+
+
+
+
 
         } else {
             console.log(`Error code ${res.status}`);
@@ -30,7 +89,6 @@ const readCsv = async () => {
     }
 }
 
-readCsv();
 
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 10,
@@ -45,6 +103,4 @@ var LeafIcon = L.Icon.extend({
     }
 });
 
-var iCon1 = new LeafIcon({iconUrl: 'https://www.bing.com/th?pid=Sgg&qlt=100&u=https%3A%2F%2Fimages.start.gg%2Fimages%2Ftournament%2F585089%2Fimage-6f3d77267362365f7bb0b99aa05d03d6-optimized.png&ehk=R2c%2BMEF%2FzHeWppOQxd%2Fvs4BUkqWQaTZAUcfFe3l8Hlk%3D&w=280&h=280&r=0'});
-
-L.marker([51.45651594883573, -0.9772721659515068], {icon: iCon1}).addTo(map).bindPopup("I am a green leaf.thesecond");
+readCsv();
