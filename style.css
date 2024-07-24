@@ -1,0 +1,5 @@
+#map { height: 600px; }
+
+.leaflet-marker-icon {
+    border-radius: 10px;
+}
